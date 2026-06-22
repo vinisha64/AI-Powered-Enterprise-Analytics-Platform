@@ -15,6 +15,7 @@ import plotly.express as px
 from analytics.data_loader import load_data
 from analytics.cleaning import clean_data
 from analytics.kpi import calculate_kpis
+from analytics.forecasting import monthly_sales_forecast
 
 # --------------------------------------------------
 # Page Configuration
@@ -74,6 +75,26 @@ with col4:
 st.divider()
 
 # --------------------------------------------------
+# Monthly Sales Trend
+# --------------------------------------------------
+
+st.subheader("📈 Monthly Sales Trend")
+
+forecast_df = monthly_sales_forecast(clean_df.copy())
+
+fig = px.line(
+    forecast_df,
+    x="Order Date",
+    y="Sales",
+    markers=True,
+    title="Monthly Revenue Trend"
+)
+
+st.plotly_chart(fig, width="stretch")
+
+st.divider()
+
+# --------------------------------------------------
 # Top Performers
 # --------------------------------------------------
 
@@ -112,10 +133,7 @@ fig_category = px.bar(
     title="Revenue by Category"
 )
 
-st.plotly_chart(
-    fig_category,
-    use_container_width=True
-)
+st.plotly_chart(fig_category, width="stretch")
 
 # --------------------------------------------------
 # Revenue by Region
@@ -136,10 +154,7 @@ fig_region = px.pie(
     title="Regional Revenue Distribution"
 )
 
-st.plotly_chart(
-    fig_region,
-    use_container_width=True
-)
+st.plotly_chart(fig_region, width="stretch")
 
 # --------------------------------------------------
 # Top 10 Products
@@ -163,10 +178,7 @@ fig_products = px.bar(
     title="Top 10 Products by Revenue"
 )
 
-st.plotly_chart(
-    fig_products,
-    use_container_width=True
-)
+st.plotly_chart(fig_products, width="stretch")
 
 # --------------------------------------------------
 # Dataset Preview
@@ -176,7 +188,7 @@ st.subheader("📄 Dataset Preview")
 
 st.dataframe(
     clean_df.head(20),
-    use_container_width=True
+    width="stretch"
 )
 
 # --------------------------------------------------
