@@ -216,6 +216,27 @@ fig_profit = px.bar(
 st.plotly_chart(fig_profit, width="stretch")
 
 # --------------------------------------------------
+# Customer Segmentation Analysis
+# --------------------------------------------------
+
+st.subheader("👥 Customer Segmentation")
+
+segment_sales = (
+    filtered_df.groupby("Segment")["Sales"]
+    .sum()
+    .reset_index()
+)
+
+fig_segment = px.pie(
+    segment_sales,
+    names="Segment",
+    values="Sales",
+    title="Revenue by Customer Segment"
+)
+
+st.plotly_chart(fig_segment, width="stretch")
+
+# --------------------------------------------------
 # Top 10 Products
 # --------------------------------------------------
 
