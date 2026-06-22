@@ -16,6 +16,7 @@ from analytics.data_loader import load_data
 from analytics.cleaning import clean_data
 from analytics.kpi import calculate_kpis
 from analytics.forecasting import monthly_sales_forecast
+from ai.recommendation_engine import generate_recommendations
 
 # --------------------------------------------------
 # Page Configuration
@@ -39,6 +40,7 @@ df = load_data("data/raw/sales_data.csv")
 clean_df, report = clean_data(df)
 
 kpis = calculate_kpis(clean_df)
+recommendations = generate_recommendations(kpis)
 
 # --------------------------------------------------
 # KPI Section
@@ -198,3 +200,9 @@ st.dataframe(
 st.subheader("🧹 Data Quality Report")
 
 st.json(report)
+st.divider()
+
+st.subheader("🤖 AI Business Recommendations")
+
+for rec in recommendations:
+    st.info(rec)
