@@ -6,17 +6,17 @@ def clean_data(df):
     report = {}
 
     # Original rows
-    report["original_rows"] = len(df)
+    report["original_rows"] = int(len(df))
 
     # Duplicates
-    duplicate_count = df.duplicated().sum()
+    duplicate_count = int(df.duplicated().sum())
     report["duplicates"] = duplicate_count
 
     df = df.drop_duplicates()
 
     # Missing values
-    missing_values = df.isnull().sum().sum()
-    report["missing_values"] = int(missing_values)
+    missing_values = int(df.isnull().sum().sum())
+    report["missing_values"] = missing_values
 
     # Fill numeric columns
     numeric_cols = df.select_dtypes(include="number").columns
@@ -31,9 +31,24 @@ def clean_data(df):
         df[col] = df[col].fillna("Unknown")
 
     # Negative Sales
-    negative_sales = (df["Sales"] < 0).sum()
-    report["negative_sales"] = int(negative_sales)
+    negative_sales = int((df["Sales"] < 0).sum())
+    report["negative_sales"] = negative_sales
 
-    report["cleaned_rows"] = len(df)
+    # Data Quality Score
+    quality_score = round(
+        (
+            1
+            - (
+                duplicate_count + missing_values
+            )
+            / max(len(df), 1)
+        )
+        * 100,
+        2
+    )
+
+    report["quality_score"] = quality_score
+
+    report["cleaned_rows"] = int(len(df))
 
     return df, report
