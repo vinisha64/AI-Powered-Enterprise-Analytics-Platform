@@ -195,6 +195,27 @@ fig_region = px.pie(
 st.plotly_chart(fig_region, width="stretch")
 
 # --------------------------------------------------
+# Profit by Category
+# --------------------------------------------------
+
+st.subheader("💹 Profit by Category")
+
+profit_category = (
+    filtered_df.groupby("Category")["Profit"]
+    .sum()
+    .reset_index()
+)
+
+fig_profit = px.bar(
+    profit_category,
+    x="Category",
+    y="Profit",
+    title="Profit by Category"
+)
+
+st.plotly_chart(fig_profit, width="stretch")
+
+# --------------------------------------------------
 # Top 10 Products
 # --------------------------------------------------
 
