@@ -38,8 +38,44 @@ st.markdown("Business Intelligence • Data Analytics • AI Insights")
 df = load_data("data/raw/sales_data.csv")
 
 clean_df, report = clean_data(df)
+st.sidebar.header("🔍 Filters")
 
-kpis = calculate_kpis(clean_df)
+selected_region = st.sidebar.selectbox(
+    "Region",
+    ["All"] + sorted(clean_df["Region"].unique().tolist())
+)
+
+selected_category = st.sidebar.selectbox(
+    "Category",
+    ["All"] + sorted(clean_df["Category"].unique().tolist())
+)
+
+selected_segment = st.sidebar.selectbox(
+    "Segment",
+    ["All"] + sorted(clean_df["Segment"].unique().tolist())
+)
+
+filtered_df = clean_df.copy()
+
+if selected_region != "All":
+    filtered_df = filtered_df[
+        filtered_df["Region"] == selected_region
+    ]
+
+if selected_category != "All":
+    filtered_df = filtered_df[
+        filtered_df["Category"] == selected_category
+    ]
+
+if selected_segment != "All":
+    filtered_df = filtered_df[
+        filtered_df["Segment"] == selected_segment
+    ]
+if filtered_df.empty:
+    st.warning("No data available for selected filters.")
+    st.stop()
+    
+kpis = calculate_kpis(filtered_df)
 recommendations = generate_recommendations(kpis)
 
 # --------------------------------------------------
@@ -82,7 +118,7 @@ st.divider()
 
 st.subheader("📈 Monthly Sales Trend")
 
-forecast_df = monthly_sales_forecast(clean_df.copy())
+forecast_df = monthly_sales_forecast(filtered_df.copy())
 
 fig = px.line(
     forecast_df,
@@ -123,7 +159,7 @@ st.divider()
 st.subheader("📦 Revenue by Category")
 
 category_sales = (
-    clean_df.groupby("Category")["Sales"]
+    filtered_df.groupby("Category")["Sales"]
     .sum()
     .reset_index()
 )
@@ -144,7 +180,7 @@ st.plotly_chart(fig_category, width="stretch")
 st.subheader("🌎 Revenue by Region")
 
 region_sales = (
-    clean_df.groupby("Region")["Sales"]
+    filtered_df.groupby("Region")["Sales"]
     .sum()
     .reset_index()
 )
@@ -165,7 +201,7 @@ st.plotly_chart(fig_region, width="stretch")
 st.subheader("🔥 Top 10 Products")
 
 top_products = (
-    clean_df.groupby("Product Name")["Sales"]
+    filtered_df.groupby("Product Name")["Sales"]
     .sum()
     .sort_values(ascending=False)
     .head(10)
@@ -187,9 +223,8 @@ st.plotly_chart(fig_products, width="stretch")
 # --------------------------------------------------
 
 st.subheader("📄 Dataset Preview")
-
 st.dataframe(
-    clean_df.head(20),
+    filtered_df.head(20),
     width="stretch"
 )
 
