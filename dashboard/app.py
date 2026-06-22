@@ -237,6 +237,29 @@ fig_segment = px.pie(
 st.plotly_chart(fig_segment, width="stretch")
 
 # --------------------------------------------------
+# Top 10 Customers
+# --------------------------------------------------
+
+st.subheader("🏆 Top 10 Customers")
+
+top_customers = (
+    filtered_df.groupby("Customer Name")["Sales"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(10)
+    .reset_index()
+)
+
+fig_customers = px.bar(
+    top_customers,
+    x="Sales",
+    y="Customer Name",
+    orientation="h",
+    title="Top 10 Customers by Revenue"
+)
+
+st.plotly_chart(fig_customers, width="stretch")
+# --------------------------------------------------
 # Top 10 Products
 # --------------------------------------------------
 
