@@ -74,7 +74,7 @@ if selected_segment != "All":
 if filtered_df.empty:
     st.warning("No data available for selected filters.")
     st.stop()
-    
+
 kpis = calculate_kpis(filtered_df)
 recommendations = generate_recommendations(kpis)
 
@@ -227,6 +227,20 @@ st.dataframe(
     filtered_df.head(20),
     width="stretch"
 )
+# --------------------------------------------------
+# Export Data
+# --------------------------------------------------
+
+st.subheader("⬇️ Export Data")
+
+csv = filtered_df.to_csv(index=False)
+
+st.download_button(
+    label="Download Filtered Dataset",
+    data=csv,
+    file_name="filtered_sales_data.csv",
+    mime="text/csv"
+)
 
 # --------------------------------------------------
 # Data Quality Report
@@ -236,6 +250,10 @@ st.subheader("🧹 Data Quality Report")
 
 st.json(report)
 st.divider()
+
+# --------------------------------------------------
+# AI Recommendations
+# --------------------------------------------------
 
 st.subheader("🤖 AI Business Recommendations")
 
