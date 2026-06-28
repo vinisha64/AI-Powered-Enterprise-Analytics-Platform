@@ -1,11 +1,10 @@
 import pandas as pd
 
-
 def calculate_kpis(df):
 
     kpis = {
-        "total_revenue": float(round(df["sales"].sum(), 2)),
-        "total_profit": float(round(df["profit"].sum(), 2)),
+        "total_revenue": round(df["sales"].sum(), 2),
+        "total_profit": round(df["profit"].sum(), 2),
         "total_orders": df["order_id"].nunique(),
         "total_customers": df["customer_id"].nunique(),
     }

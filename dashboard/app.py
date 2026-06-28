@@ -9,7 +9,6 @@ sys.path.append(
 )
 
 import streamlit as st
-import pandas as pd
 import plotly.express as px
 
 from analytics.data_loader import load_data
@@ -35,52 +34,58 @@ st.markdown("Business Intelligence • Data Analytics • AI Insights")
 # Load Data
 # --------------------------------------------------
 
-df = load_data("data/raw/sales_data.csv")
+df = load_data()
 
 clean_df, report = clean_data(df)
+
+# --------------------------------------------------
+# Sidebar Filters
+# --------------------------------------------------
+
 st.sidebar.header("🔍 Filters")
 
 selected_region = st.sidebar.selectbox(
     "Region",
-    ["All"] + sorted(clean_df["Region"].unique().tolist())
+    ["All"] + sorted(clean_df["region"].unique().tolist())
 )
 
 selected_category = st.sidebar.selectbox(
     "Category",
-    ["All"] + sorted(clean_df["Category"].unique().tolist())
+    ["All"] + sorted(clean_df["category"].unique().tolist())
 )
 
 selected_segment = st.sidebar.selectbox(
     "Segment",
-    ["All"] + sorted(clean_df["Segment"].unique().tolist())
+    ["All"] + sorted(clean_df["segment"].unique().tolist())
 )
 
 filtered_df = clean_df.copy()
 
 if selected_region != "All":
     filtered_df = filtered_df[
-        filtered_df["Region"] == selected_region
+        filtered_df["region"] == selected_region
     ]
 
 if selected_category != "All":
     filtered_df = filtered_df[
-        filtered_df["Category"] == selected_category
+        filtered_df["category"] == selected_category
     ]
 
 if selected_segment != "All":
     filtered_df = filtered_df[
-        filtered_df["Segment"] == selected_segment
+        filtered_df["segment"] == selected_segment
     ]
+
 if filtered_df.empty:
     st.warning("No data available for selected filters.")
     st.stop()
 
+# --------------------------------------------------
+# KPIs
+# --------------------------------------------------
+
 kpis = calculate_kpis(filtered_df)
 recommendations = generate_recommendations(kpis)
-
-# --------------------------------------------------
-# KPI Section
-# --------------------------------------------------
 
 st.subheader("📈 Business KPIs")
 
@@ -122,8 +127,8 @@ forecast_df = monthly_sales_forecast(filtered_df.copy())
 
 fig = px.line(
     forecast_df,
-    x="Order Date",
-    y="Sales",
+    x="order_date",
+    y="sales",
     markers=True,
     title="Monthly Revenue Trend"
 )
@@ -159,15 +164,15 @@ st.divider()
 st.subheader("📦 Revenue by Category")
 
 category_sales = (
-    filtered_df.groupby("Category")["Sales"]
+    filtered_df.groupby("category")["sales"]
     .sum()
     .reset_index()
 )
 
 fig_category = px.bar(
     category_sales,
-    x="Category",
-    y="Sales",
+    x="category",
+    y="sales",
     title="Revenue by Category"
 )
 
@@ -180,15 +185,15 @@ st.plotly_chart(fig_category, width="stretch")
 st.subheader("🌎 Revenue by Region")
 
 region_sales = (
-    filtered_df.groupby("Region")["Sales"]
+    filtered_df.groupby("region")["sales"]
     .sum()
     .reset_index()
 )
 
 fig_region = px.pie(
     region_sales,
-    names="Region",
-    values="Sales",
+    names="region",
+    values="sales",
     title="Regional Revenue Distribution"
 )
 
@@ -201,49 +206,49 @@ st.plotly_chart(fig_region, width="stretch")
 st.subheader("💹 Profit by Category")
 
 profit_category = (
-    filtered_df.groupby("Category")["Profit"]
+    filtered_df.groupby("category")["profit"]
     .sum()
     .reset_index()
 )
 
 fig_profit = px.bar(
     profit_category,
-    x="Category",
-    y="Profit",
+    x="category",
+    y="profit",
     title="Profit by Category"
 )
 
 st.plotly_chart(fig_profit, width="stretch")
 
 # --------------------------------------------------
-# Customer Segmentation Analysis
+# Customer Segmentation
 # --------------------------------------------------
 
 st.subheader("👥 Customer Segmentation")
 
 segment_sales = (
-    filtered_df.groupby("Segment")["Sales"]
+    filtered_df.groupby("segment")["sales"]
     .sum()
     .reset_index()
 )
 
 fig_segment = px.pie(
     segment_sales,
-    names="Segment",
-    values="Sales",
+    names="segment",
+    values="sales",
     title="Revenue by Customer Segment"
 )
 
 st.plotly_chart(fig_segment, width="stretch")
 
 # --------------------------------------------------
-# Top 10 Customers
+# Top Customers
 # --------------------------------------------------
 
 st.subheader("🏆 Top 10 Customers")
 
 top_customers = (
-    filtered_df.groupby("Customer Name")["Sales"]
+    filtered_df.groupby("customer_name")["sales"]
     .sum()
     .sort_values(ascending=False)
     .head(10)
@@ -252,21 +257,22 @@ top_customers = (
 
 fig_customers = px.bar(
     top_customers,
-    x="Sales",
-    y="Customer Name",
+    x="sales",
+    y="customer_name",
     orientation="h",
     title="Top 10 Customers by Revenue"
 )
 
 st.plotly_chart(fig_customers, width="stretch")
+
 # --------------------------------------------------
-# Top 10 Products
+# Top Products
 # --------------------------------------------------
 
 st.subheader("🔥 Top 10 Products")
 
 top_products = (
-    filtered_df.groupby("Product Name")["Sales"]
+    filtered_df.groupby("product_name")["sales"]
     .sum()
     .sort_values(ascending=False)
     .head(10)
@@ -275,8 +281,8 @@ top_products = (
 
 fig_products = px.bar(
     top_products,
-    x="Sales",
-    y="Product Name",
+    x="sales",
+    y="product_name",
     orientation="h",
     title="Top 10 Products by Revenue"
 )
@@ -288,10 +294,12 @@ st.plotly_chart(fig_products, width="stretch")
 # --------------------------------------------------
 
 st.subheader("📄 Dataset Preview")
+
 st.dataframe(
     filtered_df.head(20),
     width="stretch"
 )
+
 # --------------------------------------------------
 # Export Data
 # --------------------------------------------------
@@ -314,6 +322,7 @@ st.download_button(
 st.subheader("🧹 Data Quality Report")
 
 st.json(report)
+
 st.divider()
 
 # --------------------------------------------------
@@ -322,5 +331,5 @@ st.divider()
 
 st.subheader("🤖 AI Business Recommendations")
 
-for rec in recommendations:
-    st.info(rec)
+for recommendation in recommendations:
+    st.info(recommendation)
