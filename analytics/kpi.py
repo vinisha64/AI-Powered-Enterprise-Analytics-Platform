@@ -1,23 +1,24 @@
 import pandas as pd
 
+
 def calculate_kpis(df):
 
     kpis = {
-        "total_revenue": round(df["Sales"].sum(), 2),
-        "total_profit": round(df["Profit"].sum(), 2),
-        "total_orders": df["Order ID"].nunique(),
-        "total_customers": df["Customer ID"].nunique(),
+        "total_revenue": float(round(df["sales"].sum(), 2)),
+        "total_profit": float(round(df["profit"].sum(), 2)),
+        "total_orders": df["order_id"].nunique(),
+        "total_customers": df["customer_id"].nunique(),
     }
 
     top_product = (
-        df.groupby("Product Name")["Sales"]
+        df.groupby("product_name")["sales"]
         .sum()
         .sort_values(ascending=False)
         .head(1)
     )
 
     top_customer = (
-        df.groupby("Customer Name")["Sales"]
+        df.groupby("customer_name")["sales"]
         .sum()
         .sort_values(ascending=False)
         .head(1)
