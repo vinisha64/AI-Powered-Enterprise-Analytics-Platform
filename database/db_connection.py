@@ -1,5 +1,5 @@
 import psycopg2
-
+import os
 
 def get_connection():
     """
@@ -11,7 +11,9 @@ def get_connection():
         port="5432",
         database="enterprise_analytics",
         user="postgres",
-        password="Vinisha@2005"
+        
+
+        password=os.getenv("DB_PASSWORD")
     )
 
     return conn
